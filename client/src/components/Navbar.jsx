@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -18,7 +18,7 @@ const Navbar = () => {
     ];
 
 
-    const [isScrolled, setIsScrolled] = useState(false);
+    const [isScrolledState, setIsScrolledState] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const {openSignIn} = useClerk();
@@ -26,23 +26,18 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     
+    const isScrolled = location.pathname !== '/' || isScrolledState;
 
     useEffect(() => {
-
-        if(location.pathname !== '/'){
-            setIsScrolled(true);
-            return;
-        }else{
-            setIsScrolled(false);
-        }
-        setIsScrolled(prev => location.pathname !== '/' ? true : prev)
-
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10);
+            setIsScrolledState(window.scrollY > 10);
         };
+
+        handleScroll();
+
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
-    }, [location.pathname]);
+    }, []);
 
     return (
             <nav className={`fixed top-0 left-0 w-full flex items-center justify-between px-4 md:px-16 lg:px-24 xl:px-32 transition-all duration-500 z-50 ${isScrolled ? "bg-white/80 shadow-md text-gray-700 backdrop-blur-lg py-3 md:py-4" : "py-4 md:py-6"}`}>
@@ -67,7 +62,7 @@ const Navbar = () => {
 
                 {/* Desktop Right */}
                 <div className="hidden md:flex items-center gap-4">
-                    <img src={assets.searchIcon} alt="search icons" className={`{isScrolled && "invert"} h-7 transition-all duration-500`} />
+                    <img src={assets.searchIcon} alt="search icons" className={`${isScrolled && "invert"} h-7 transition-all duration-500`} />
 
                     {user ? 
                     (<UserButton>
