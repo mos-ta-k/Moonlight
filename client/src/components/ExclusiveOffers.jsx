@@ -7,8 +7,7 @@ const ExclusiveOffers = () => {
   return (
     <div className='flex flex-col items-center px-6 md:px-16 lg:px-24 xl:px-31 pt-15 pb-30'>
         <div className='flex flex-col md:flex-row items-center justify-between w-full'>
-            <Title
-            align='left' 
+            <Title align="left"
             title='Exclusive Offers' subtitle='Explore our top handpicked selections of exceptional properties around the country, offering unparalleled comfort, luxury, and authentic experiences.'/>
             <button className='group flex items-center gap-2 font-medium cursor-pointer max-md:mt-10'>
                 View All Offers
