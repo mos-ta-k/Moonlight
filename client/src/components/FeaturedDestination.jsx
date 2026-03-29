@@ -12,7 +12,7 @@ const FeaturedDestination = () => {
         <Title title='Featured Destinations' subtitle='Explore our top handpicked selections of exceptional properties around the country, offering unparalleled comfort, luxury, and authentic experiences.' />
         <div className='flex flex-wrap items-center justify-center px-6 md:px-16 lg:px-16 lg:px-24 bg-slate-50 py-15 pb-5 gap-7'>
             {roomsDummyData.slice(0, 4).map((room, index) => (
-                <HotelCard key={room._id} room={room} index={index} />
+                <HotelCard key={room._id} room={room} index={index} onClick={() => { navigate(`/rooms/${room._id}`); window.scrollTo(0, 0) }} />
             ))}
         </div>
 
