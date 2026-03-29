@@ -1,31 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { roomsDummyData } from '../../assets/assets'
 import Title from '../../components/title'
-import { useState } from 'react'
 
 const ListRoom = () => {
-
     const [rooms, setRooms] = useState(roomsDummyData)
 
-  return (
-    <div>
-        <Title align="left" font="outfit" title="List Room" subtitle="Manage your room listings" />
-        <p className='text-gray-500 mt-8'>All Rooms</p>
+    const toggleAvailability = (index) => {
+        setRooms(prev =>
+            prev.map((room, i) =>
+                i === index ? { ...room, isAvailable: !room.isAvailable } : room
+            )
+        )
+    }
 
-        <div className='w-full max-w-3xl text-left border border-gray-300 rounded-lg max-h-80 overflow-y-scroll mt-3'>
-            <table className='w-full'>
-                <thead className='bg-gray-50'>
-                    <tr>
-                        <th className='py-3 px-4 text-gray-800 font-medium'>Name</th>
-                        <th className='py-3 px-4 text-gray-800 font-medium max-sm:hidden'>facility</th>
-                        <th className='py-3 px-4 text-gray-800 font-medium text-center'>price / night</th>
-                        <th className='py-3 px-4 text-gray-800 font-medium text-center'>Actions</th>
-                    </tr>
-                </thead>    
+    return (
+        <div>
+            <Title align="left" font="outfit" title="List Room" subtitle="Manage your room listings" />
+            <p className='text-gray-500 mt-8'>All Rooms</p>
 
-                <tbody className='text-sm'>
-                    {
-                        rooms.map((item, index)=>(
+            <div className='w-full max-w-3xl text-left border border-gray-300 rounded-lg max-h-80 overflow-y-scroll mt-3'>
+                <table className='w-full'>
+                    <thead className='bg-gray-50'>
+                        <tr>
+                            <th className='py-3 px-4 text-gray-800 font-medium'>Name</th>
+                            <th className='py-3 px-4 text-gray-800 font-medium max-sm:hidden'>Facility</th>
+                            <th className='py-3 px-4 text-gray-800 font-medium text-center'>Price / Night</th>
+                            <th className='py-3 px-4 text-gray-800 font-medium text-center'>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody className='text-sm'>
+                        {rooms.map((item, index) => (
                             <tr key={index}>
                                 <td className='py-3 px-4 text-gray-700 border-t border-gray-300'>
                                     {item.roomType}
@@ -39,26 +44,25 @@ const ListRoom = () => {
                                     ৳{item.pricePerNight}
                                 </td>
 
-                                <td className='py-2 px-4 border-t border-gray-300 text-sm text-red-500 text-center'>
+                                <td className='py-2 px-4 border-t border-gray-300 text-sm text-center'>
                                     <label className='relative inline-flex items-center cursor-pointer text-gray-900 gap-3'>
-                                        <input type="checkbox" className='sr-only peer' checked={item.isAvailable} />
-                                        <div className='w-12 h-7 bg-slate-300 rounded-full peer peer-check:bg-blue-600 transition-colors duration-200'></div>
-                                        <span className='dot absolute left-1 top-1 w-5 h-5 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-5'></span>
+                                        <input
+                                            type="checkbox"
+                                            className='sr-only peer'
+                                            checked={item.isAvailable}
+                                            onChange={() => toggleAvailability(index)}
+                                        />
+                                        <div className={`w-12 h-7 rounded-full transition-colors duration-200 ${item.isAvailable ? 'bg-blue-600' : 'bg-slate-300'}`}></div>
+                                        <span className={`absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ease-in-out ${item.isAvailable ? 'translate-x-5' : ''}`}></span>
                                     </label>
-
                                 </td>
-
                             </tr>
-
-                        ))
-                    }
-                </tbody>
-
-            </table>
-
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-  )
+    )
 }
 
 export default ListRoom
