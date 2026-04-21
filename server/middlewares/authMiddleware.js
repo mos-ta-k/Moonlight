@@ -1,12 +1,23 @@
+import { getAuth } from "@clerk/express";
 import User from "../models/user.model.js";
 
-//middleware to check if user is authenticated
 export const protect = async (req, res, next) => {
-    const {userId} = req.body;
-    if(!userId){
-        return res.json({success: false, error: "Unauthorized"});
+    try {
+        const { userId } = getAuth(req);
+
+        if (!userId) {
+            return res.json({ success: false, error: "Unauthorized - Not logged in" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.json({ success: false, error: "User not found in DB" });
+        }
+
+        req.user = user;
+        next();
+    } catch (error) {
+        console.error("Auth error:", error.message);
+        return res.json({ success: false, error: "Unauthorized" });
     }
-    const user = await User.findById(userId);
-    req.user = user;
-    next();
-}
+};
