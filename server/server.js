@@ -5,6 +5,9 @@ import "dotenv/config";
 import { clerkMiddleware } from '@clerk/express'
 import clerkWebhooks from "./controllers/clerkWebhooks.js";
 import userRouter from "./routes/user.route.js";
+import hotelRouter from "./routes/hotel.route.js";
+import roomRouter from "./routes/room.route.js";
+import connectCloudinary from "./configs/cloudinary.js";
 
 const app = express();
 
@@ -20,12 +23,15 @@ app.use(clerkMiddleware());
 
 // Connect to database
 connectDB();
+connectCloudinary();
 
 // Routes
 app.get("/", (req, res) => {
     res.send("API is running...");
 });
 app.use("/api/user", userRouter);
+app.use("/api/hotel", hotelRouter);
+app.use("/api/rooms", roomRouter);
 
 // Start server
 const PORT = process.env.PORT || 3000;
