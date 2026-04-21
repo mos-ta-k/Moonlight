@@ -4,6 +4,7 @@ import connectDB from "./configs/db.js";
 import "dotenv/config";
 import { clerkMiddleware } from '@clerk/express'
 import clerkWebhooks from "./controllers/clerkWebhooks.js";
+import userRouter from "./routes/user.route.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ connectDB();
 app.get("/", (req, res) => {
     res.send("API is running...");
 });
+app.use("/api/user", userRouter);
 
 // Start server
 const PORT = process.env.PORT || 3000;
