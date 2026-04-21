@@ -8,6 +8,7 @@ import userRouter from "./routes/user.route.js";
 import hotelRouter from "./routes/hotel.route.js";
 import roomRouter from "./routes/room.route.js";
 import connectCloudinary from "./configs/cloudinary.js";
+import bookingRouter from "./routes/booking.route.js";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRouter);
 app.use("/api/hotel", hotelRouter);
 app.use("/api/rooms", roomRouter);
+app.use("/api/bookings", bookingRouter);
 
 // Start server
 const PORT = process.env.PORT || 3000;
