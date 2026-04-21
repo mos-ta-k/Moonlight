@@ -4,7 +4,6 @@
     {
       "src": "server.js",
       "use": "@vercel/node",
-      "bodyParser": false,
       "config": {
         "includeFiles": ["dist/**"]
       }
