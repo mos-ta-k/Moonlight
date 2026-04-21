@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 const connectDB = async () => {
     try {
         console.log("MONGODB_URI:", process.env.MONGODB_URI ? "is set" : "UNDEFINED!");
