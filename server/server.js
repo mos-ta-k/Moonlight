@@ -10,12 +10,12 @@ const app = express();
 // Middleware
 app.use(cors());
 
+//api to listen clerk webhooks BEFORE express.json() parses the body
+app.post("/api/clerk", express.raw({ type: 'application/json' }), clerkWebhooks);
+
 //middleware
 app.use(express.json());
 app.use(clerkMiddleware());
-
-//api to listen clerk webhooks
-app.post("/api/clerk", clerkWebhooks);
 
 // Connect to database
 connectDB();

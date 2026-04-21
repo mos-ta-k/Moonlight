@@ -13,22 +13,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    password:{
-        type: String,
-        required: true
-    },
     role:{
         type: String,
         enum: ["hotelOwner", "user"],
         default: "user"
     },
     image:{
-        type: String,
-        required: true
+        type: String
     },
     recentSearchedCities:{
         type: String,
-        required: true
+        default: ""
     }
 }, {timestamps: true});
 

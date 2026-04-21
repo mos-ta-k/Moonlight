@@ -1,40 +1,44 @@
 import User from "../models/user.model.js";
 import { Webhook } from "svix";
+import mongoose from "mongoose";
+import connectDB from "../configs/db.js";
 
 const clerkWebhooks = async (req, res) => {
     try {
+        // Reconnect if cold start killed the connection
+        if (mongoose.connection.readyState === 0) {
+            await connectDB();
+        }
 
-        //creating svix instance with clerk webhook secret
-        const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
-        
-        //headers
+        if (!process.env.CLERK_WEBHOOK_SECRET) {
+            return res.status(500).json({ success: false, error: "Webhook secret not configured" });
+        }
+
+        const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
         const headers = {
             "svix-id": req.headers["svix-id"],
             "svix-timestamp": req.headers["svix-timestamp"],
             "svix-signature": req.headers["svix-signature"]
-        }
+        };
 
-        //header verification
-        await whook.verify(JSON.stringify(req.body), headers);
+        const payload = req.body.toString("utf8");
+        await whook.verify(payload, headers);
 
-        //get user data
-        const {data, type} = req.body;
+        const { data, type } = JSON.parse(payload);
 
         const userData = {
             _id: data.id,
-            email: data.email_addresses[0].email_address,
-            username: data.first_name + " " + data.last_name,
+            email: data.email_addresses?.[0]?.email_address,
+            username: `${data.first_name || ""}${data.last_name ? " " + data.last_name : ""}`.trim() || "Unknown",
             image: data.image_url,
-            role: data.role
-        }
+        };
 
-        //switch cases for different webhook types
         switch (type) {
             case "user.created":
                 await User.create(userData);
                 break;
             case "user.updated":
-                await User.findByIdAndUpdate(data.id, userData);
+                await User.findByIdAndUpdate(data.id, userData, { new: true });
                 break;
             case "user.deleted":
                 await User.findByIdAndDelete(data.id);
@@ -44,11 +48,10 @@ const clerkWebhooks = async (req, res) => {
         }
 
         res.json({ success: true, message: "Webhook processed successfully" });
-        
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, error: error.message });
+        console.error("Webhook error:", error.message);
+        res.status(400).json({ success: false, error: error.message });
     }
 };
 
