@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { assets } from '../assets/assets'
 
 const HotelCard = ({ room, index }) => {
-  // Fix #1: guard against missing images, hotel name, and hotel address
   const imageUrl = room.images?.[0] || assets.uploadArea
   const hotelName = room.hotel?.name || 'Unknown Hotel'
   const hotelAddress = room.hotel?.address || 'No address available'
@@ -11,9 +10,8 @@ const HotelCard = ({ room, index }) => {
     <Link
       to={`/rooms/${room._id}`}
       onClick={() => window.scrollTo(0, 0)}
-      className='relative max-w-70 w-full rounded-xl overflow-hidden bg-white text-gray-500/90 shadow-[0px_4px_4px_rgba(0,0,0,0.05)]'
+      className='relative max-w-65 w-full rounded-xl overflow-hidden bg-white text-gray-500/90 shadow-[0px_4px_4px_rgba(0,0,0,0.05)]'
     >
-      {/* Fix #2: added w-full h-48 object-cover so image renders consistently */}
       <img src={imageUrl} alt={hotelName} className='w-full h-48 object-cover' />
 
       {index % 2 === 0 && (
@@ -22,7 +20,7 @@ const HotelCard = ({ room, index }) => {
         </p>
       )}
 
-      <div className='p-4'>
+      <div className='p-4' >
         <div className='flex items-center justify-between'>
           <p className='font-playfair text-xl font-medium text-gray-800'>{hotelName}</p>
           <div className='flex items-center gap-1'>
@@ -32,7 +30,6 @@ const HotelCard = ({ room, index }) => {
 
         <div className='flex items-center gap-1 text-sm mt-1'>
           <img src={assets.locationIcon} alt="location icon" />
-          {/* Fix #1: was room.hotel.address (crashes if hotel not populated) */}
           <span>{hotelAddress}</span>
         </div>
 

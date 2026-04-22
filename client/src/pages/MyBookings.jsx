@@ -1,9 +1,33 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Title from '../components/title'
-import { userBookingsDummyData, assets } from '../assets/assets'
+import { assets } from '../assets/assets'
+import { useAppContext } from '../context/AppContext'
 
 const MyBookings = () => {
-    const [bookings, setBookings] = useState(userBookingsDummyData)
+    const [bookings, setBookings] = useState([])
+    const {axios, getToken, user} = useAppContext();
+
+    const fetchUserBookings = async () => {
+        try {
+            const token = await getToken();
+            const response = await axios.get('/api/bookings/user', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+                
+            });
+            console.log("BOOKINGS RESPONSE:", response.data);
+            setBookings(response.data.bookings);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        if(user){
+            fetchUserBookings();
+        }
+    }, [user]);
 
     const formatDate = (dateStr) => {
         const date = new Date(dateStr)

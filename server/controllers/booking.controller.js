@@ -83,13 +83,18 @@ export const createBooking = async (req, res) => {
 export const getUserBookings = async (req, res) => {
     try {
         const user = req.user._id;
-        const bookings = await (await Booking.find({user}).populate("room hotel")).sort({createdAt: -1});
-        res.json({success: true, bookings});
+
+        const bookings = await Booking.find({ user })
+            .populate("room hotel")
+            .sort({ createdAt: -1 });
+
+        res.json({ success: true, bookings });
+
     } catch (error) {
         console.error("Get user bookings error:", error.message);
-        res.json({success: false, error: "Internal server error"});
+        res.json({ success: false, error: "Internal server error" });
     }
-};  
+};
 
 export const getHotelBookings = async (req, res) => {
     try{

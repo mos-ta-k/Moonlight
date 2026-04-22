@@ -132,7 +132,7 @@ export const testimonials = [
   },
   {
     id: 2,
-    name: "Nusrat Jahan",
+    name: "Tanvir Hasan",
     address: "Agrabad, Chattogram, Bangladesh",
     image:
       "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200",
@@ -142,7 +142,7 @@ export const testimonials = [
   },
   {
     id: 3,
-    name: "Tanvir Hasan",
+    name: "Nusrat Jahan",
     address: "Zindabazar, Sylhet, Bangladesh",
     image:
       "https://images.unsplash.com/photo-1701615004837-40d8573b6652?q=80&w=200",
