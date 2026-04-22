@@ -1,21 +1,22 @@
 // function to check availability of room
 
 import Room from "../models/room.model.js";
+import Hotel from "../models/hotel.model.js";
 import Booking from "../models/booking.model.js";
 
-const checkAvailability = async (req, res) => {
-    const {checkInDate, checkOutDate, room} = req.body;
+// Internal helper — returns a boolean
+const checkAvailability = async ({checkInDate, checkOutDate, room}) => {
     try {
+        // Find any booking that overlaps with the requested dates
         const bookings = await Booking.find({
             room,
-            checkInDate: {$lte: checkInDate},
-            checkOutDate: {$gte: checkOutDate}
+            checkInDate: { $lt: new Date(checkOutDate) },
+            checkOutDate: { $gt: new Date(checkInDate) }
         });
-        const isAvailable = bookings.length === 0;
-        return isAvailable;
+        return bookings.length === 0;
     } catch (error) {
         console.error("Check availability error:", error.message);
-        res.json({success: false, error: "Internal server error"});
+        return false;
     }
 }
 
@@ -36,17 +37,19 @@ export const checkAvailabilityAPI = async (req, res) => {
 //POST /api/bookings/book
 export const createBooking = async (req, res) => {
     try {
-        const {checkInDate, checkOutDate, guest}= req.body;
+        const {room, checkInDate, checkOutDate, guests, paymentMethod} = req.body;
         const user = req.user._id;
 
-        //before booking chekc availability
+        //before booking check availability
         const isAvailable = await checkAvailability({checkInDate, checkOutDate, room});
         if(!isAvailable){
-            return res.json({success: false, error: "Room is not available"});
+            return res.json({success: false, message: "Room is not available for selected dates"});
         }
 
         //get total price of room
         const roomData = await Room.findById(room).populate("hotel");
+        if(!roomData) return res.json({success: false, message: "Room not found"});
+
         let totalPrice = roomData.pricePerNight;
 
         //calculate total price based on nights
@@ -64,7 +67,8 @@ export const createBooking = async (req, res) => {
             guests: +guests,
             checkInDate,
             checkOutDate,
-            totalPrice
+            totalPrice,
+            paymentMethod: paymentMethod || 'Pay at hotel'
         });
         res.json({success: true, message: "Booking created successfully"});
 
