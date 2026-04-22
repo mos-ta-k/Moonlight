@@ -1,74 +1,124 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Title from '../../components/title'
-import { assets, dashboardDummyData } from '../../assets/assets'
-import { useState } from 'react'
+import { assets } from '../../assets/assets'
+import { useAppContext } from '../../context/AppContext'
 
 const Dashboard = () => {
 
-    const [DashboardData, setDashboardData] = useState(dashboardDummyData)
-  return (
-    <div>
-        <Title align="left" font="outfit" title="Dashboard" subtitle='Monitor your room listing, track bookings and analze revenue-all in one place. Stay updated with real-time insights and manage your hotel effortlessly.'/>
+    const { currency, user, getToken, axios } = useAppContext();
 
-        <div className='flex gap-4 my-8'>
-            {/* total bookings  */}
-            <div className='bg-primary/3 border border-primary/10 rounded flex p-4 pr-8'>
-                <img src={assets.totalBookingIcon} alt="" className='max-sm:hidden h-10'/>
-                <div className='flex flex-col sm:ml-4 font-medium'>
-                    <p className='text-blue-500 text-lg'>Total Bookings</p>
-                    <p className='text-neutral-400 text-base'>{DashboardData.totalBookings}</p>
+    const [dashboardData, setDashboardData] = useState({
+        bookings: [],
+        totalBookings: 0,
+        totalRevenue: 0
+    })
+
+    const fetchDashboardData = async () => {
+        try {
+            const { data } = await axios.get("/api/bookings/hotel", {
+                headers: { Authorization: `Bearer ${await getToken()}` }
+            })
+            if (data.success) {
+                setDashboardData(data.dashboardData)
+            } else {
+                console.error(data.message)
+            }
+        } catch (error) {
+            console.error(error.message)
+        }
+    }
+
+    useEffect(() => {
+        if (user) {
+            fetchDashboardData()
+        }
+    }, [user])
+
+    return (
+        <div>
+            <Title
+                align="left"
+                font="outfit"
+                title="Dashboard"
+                subtitle='Monitor your room listing, track bookings and analyze revenue — all in one place. Stay updated with real-time insights and manage your hotel effortlessly.'
+            />
+
+            <div className='flex gap-4 my-8'>
+
+                {/* Total Bookings */}
+                <div className='bg-primary/3 border border-primary/10 rounded flex p-4 pr-8'>
+                    <img src={assets.totalBookingIcon} alt="" className='max-sm:hidden h-10' />
+                    <div className='flex flex-col sm:ml-4 font-medium'>
+                        <p className='text-blue-500 text-lg'>Total Bookings</p>
+                        {/* Fix #1: was DashboardData (capital D) → dashboardData */}
+                        <p className='text-neutral-400 text-base'>{dashboardData.totalBookings}</p>
+                    </div>
                 </div>
- 
+
+                {/* Total Revenue */}
+                <div className='bg-primary/3 border border-primary/10 rounded flex p-4 pr-8'>
+                    <img src={assets.totalRevenueIcon} alt="" className='max-sm:hidden h-10' />
+                    <div className='flex flex-col sm:ml-4 font-medium'>
+                        <p className='text-blue-500 text-lg'>Total Revenue</p>
+                        {/* Fix #1: was DashboardData (capital D) → dashboardData */}
+                        <p className='text-neutral-400 text-base'>{currency}{dashboardData.totalRevenue}</p>
+                    </div>
+                </div>
+
             </div>
 
-            {/* total revenue  */}
-            <div className='bg-primary/3 border border-primary/10 rounded flex p-4 pr-8'>
-                <img src={assets.totalRevenueIcon} alt="" className='max-sm:hidden h-10'/>
-                <div className='flex flex-col sm:ml-4 font-medium'>
-                    <p className='text-blue-500 text-lg'>Total Revenue</p>
-                    <p className='text-neutral-400 text-base'>৳{DashboardData.totalRevenue}</p>
-                </div>
-            </div>
+            <h2 className='text-xl text-blue-950/70 font-medium mb-5'>Recent Bookings</h2>
 
-            {/* recent bookings  */}
-            
-        </div>
-        <h2 className='text-xl text-blue-950/70 font-medium mb-5'>Recent Bookings</h2> 
-
-        <div className='w-full max-w-3xl text-left border border-gray-300 rounded-lg max-h-80 overflow-y-scroll'>
-            <table className='w-full'>
-                <thead className='bg-gray-50'>
-                    <tr>
-                        <th className='py-3 px-4 text-gray-800 font-medium'>User Name</th>
-                        <th className='py-3 px-4 text-gray-800 font-medium max-sm:hidden'>Room Name</th>
-                        <th className='py-3 px-4 text-gray-800 font-medium text-center'>Amount</th>
-                        <th className='py-3 px-4 text-gray-800 font-medium text-center'>Payment Status</th>
-                    </tr>
-                </thead>    
-
-                <tbody className='text-sm'>
-                    {DashboardData.bookings.map((item, index)=>(
-                        <tr key={index} className='border-b border-gray-200 hover:bg-gray-50'>
-                            <td className='py-3 border-t border-gray-300 px-4'>{item.user.username}</td>
-                            <td className='py-3 border-t border-gray-300 px-4 max-sm:hidden'>{item.room.roomType}</td>
-                            <td className='py-3 border-t border-gray-300 px-4 text-center'>৳{item.totalPrice}</td>
-                            <td className='py-3 border-t border-gray-300 px-4 flex'>
-                                <button className={`py-2 px-4 rounded-full mx-auto ${item.isPaid ? 'bg-green text-green-600' : 'bg-amber-200 text-yellow'
-                                }`}>
-                                    {item.isPaid ? "Paid" : "Pending"}
-                                </button>
-                            </td>
+            <div className='w-full max-w-3xl text-left border border-gray-300 rounded-lg max-h-80 overflow-y-scroll'>
+                <table className='w-full'>
+                    <thead className='bg-gray-50'>
+                        <tr>
+                            <th className='py-3 px-4 text-gray-800 font-medium'>User Name</th>
+                            <th className='py-3 px-4 text-gray-800 font-medium max-sm:hidden'>Room Name</th>
+                            <th className='py-3 px-4 text-gray-800 font-medium text-center'>Amount</th>
+                            <th className='py-3 px-4 text-gray-800 font-medium text-center'>Payment Status</th>
                         </tr>
-                    ))}
+                    </thead>
 
-                </tbody>
-            </table>    
-        </div> 
+                    <tbody className='text-sm'>
+                        {/* Fix #1: was DashboardData.bookings → dashboardData.bookings */}
+                        {dashboardData.bookings.map((item, index) => (
+                            <tr key={index} className='border-b border-gray-200 hover:bg-gray-50'>
+                                <td className='py-3 border-t border-gray-300 px-4'>
+                                    {item.user?.username || item.user?.firstName || 'N/A'}
+                                </td>
+                                <td className='py-3 border-t border-gray-300 px-4 max-sm:hidden'>
+                                    {item.room?.roomType || 'N/A'}
+                                </td>
+                                <td className='py-3 border-t border-gray-300 px-4 text-center'>
+                                    {currency}{item.totalPrice}
+                                </td>
+                                <td className='py-3 border-t border-gray-300 px-4'>
+                                    {/* Fix #2: was `bg-green text-green-600` and `text-yellow` — invalid Tailwind classes */}
+                                    <button className={`py-1 px-4 rounded-full mx-auto block text-xs font-medium ${
+                                        item.isPaid
+                                            ? 'bg-green-100 text-green-600'
+                                            : 'bg-amber-100 text-amber-600'
+                                    }`}>
+                                        {item.isPaid ? "Paid" : "Pending"}
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
 
-
-
-    </div>
-  )
+                        {/* Empty state */}
+                        {dashboardData.bookings.length === 0 && (
+                            <tr>
+                                <td colSpan={4} className='py-6 text-center text-gray-400'>
+                                    No bookings yet
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    )
 }
 
 export default Dashboard
