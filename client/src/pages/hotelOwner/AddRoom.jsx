@@ -16,6 +16,7 @@ const AddRoom = () => {
     })
 
     const [input, setInput] = useState({
+        roomName: "",
         roomType: "",
         pricePerNight: "",
         maxOccupancy: "",
@@ -114,6 +115,17 @@ const AddRoom = () => {
             </div>
 
             <div className='flex w-full max-sm:flex-col sm:gap-4 mt-4'>
+                {/* <div className='flex-1 max-w-48'>
+                    <p className='text-gray-800 mt-4'>Room Name</p>
+                    <input
+                        type="text"
+                        placeholder='Suite Name'
+                        className='border border-gray-300 mt-1 rounded p-2 w-full'
+                        value={input.roomName}
+                        onChange={e => setInput({ ...input, roomName: e.target.value })}
+                    />
+                </div> */}
+
                 <div className='flex-1 max-w-48'>
                     <p className='text-gray-800 mt-4'>Room Type</p>
                     <select

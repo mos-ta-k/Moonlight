@@ -3,7 +3,7 @@ import Hotel from "./hotel.model.js";
 
 const roomSchema = new mongoose.Schema({
     hotel: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Hotel",
         required: true
     },
