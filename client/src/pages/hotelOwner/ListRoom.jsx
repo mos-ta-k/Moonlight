@@ -1,16 +1,61 @@
-import React, { useState } from 'react'
-import { roomsDummyData } from '../../assets/assets'
+import { useEffect, useState } from 'react'
 import Title from '../../components/title'
+import { useAppContext } from '../../context/AppContext'
+import toast from 'react-hot-toast'
 
 const ListRoom = () => {
-    const [rooms, setRooms] = useState(roomsDummyData)
+    const [rooms, setRooms] = useState([])
+    const {axios, getToken, user} = useAppContext();
 
-    const toggleAvailability = (index) => {
+    //fetch room for the hotel owner
+
+    const fetchRooms = async () =>{
+        try {
+            const {data} = await axios.get('/api/rooms/owner', {headers: {Authorization: `Bearer ${await getToken()}`}})   
+            
+            if(data.success){
+                setRooms(data.rooms)
+            }else{
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    useEffect(()=>{
+       if(user){
+         fetchRooms()
+       }
+    },[user])
+
+    const toggleAvailability = async (index, roomId) => {
         setRooms(prev =>
             prev.map((room, i) =>
                 i === index ? { ...room, isAvailable: !room.isAvailable } : room
             )
         )
+        try {
+            const token = await getToken()
+            const {data} = await axios.post('/api/rooms/toggle-availability', {roomId}, {headers: {Authorization: `Bearer ${token}`}})
+            if(!data.success){
+                toast.error(data.message)
+                setRooms(prev =>
+                    prev.map((room, i) =>
+                        i === index ? { ...room, isAvailable: !room.isAvailable } : room
+                    )
+                )
+            } else {
+                toast.success(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+            setRooms(prev =>
+                 prev.map((room, i) =>
+                     i === index ? { ...room, isAvailable: !room.isAvailable } : room
+                 )
+            )
+        }
     }
 
     return (
@@ -50,7 +95,7 @@ const ListRoom = () => {
                                             type="checkbox"
                                             className='sr-only peer'
                                             checked={item.isAvailable}
-                                            onChange={() => toggleAvailability(index)}
+                                            onChange={() => toggleAvailability(index, item._id)}
                                         />
                                         <div className={`w-12 h-7 rounded-full transition-colors duration-200 ${item.isAvailable ? 'bg-blue-600' : 'bg-slate-300'}`}></div>
                                         <span className={`absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ease-in-out ${item.isAvailable ? 'translate-x-5' : ''}`}></span>
