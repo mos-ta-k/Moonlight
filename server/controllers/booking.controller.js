@@ -116,3 +116,4 @@ export const getHotelBookings = async (req, res) => {
         res.json({success: false, error: "Internal server error"});
     }
 }
+

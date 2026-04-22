@@ -1,17 +1,17 @@
+import { Toaster } from "react-hot-toast";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Footer from "./components/Footer";
+import HotelReg from "./components/HotelReg";
 import Navbar from "./components/Navbar";
+import { useAppContext } from "./context/AppContext";
 import AllRooms from "./pages/AllRooms";
 import Home from "./pages/Home";
+import AddRoom from "./pages/hotelOwner/AddRoom";
+import Dashboard from "./pages/hotelOwner/Dashboard";
+import Layout from "./pages/hotelOwner/Layout";
+import ListRoom from "./pages/hotelOwner/ListRoom";
 import MyBookings from "./pages/MyBookings";
 import RoomDetails from "./pages/RoomDetails";
-import HotelReg from "./components/HotelReg";
-import Layout from "./pages/hotelOwner/Layout";
-import Dashboard from "./pages/hotelOwner/Dashboard";
-import AddRoom from "./pages/hotelOwner/AddRoom";
-import ListRoom from "./pages/hotelOwner/ListRoom";
-import { Toaster } from "react-hot-toast";
-import { AppProvider, useAppContext } from "./context/AppContext";
 
 const App = () => {
   const isOwnerPath = useLocation().pathname.includes("owner");
