@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 
 const AddRoom = () => {
 
-    const {axios, getToken} = useAppContext();
+    const { axios, getToken } = useAppContext();
 
     const [images, setImages] = useState({
         1: null,
@@ -27,7 +27,6 @@ const AddRoom = () => {
             "Pool Access": false,
         },
         description: "",
-        hotelId: ""
     })
 
     const [loading, setLoading] = useState(false)
@@ -35,33 +34,36 @@ const AddRoom = () => {
     const onSubmitHandler = async (e) => {
         e.preventDefault();
 
-        // check if all inputs are filled
-        if(!input.roomType || !input.pricePerNight || !input.amenities || !input.object.values(images).some(image => image)){
+        if (!input.roomType || !input.pricePerNight || !input.maxOccupancy || !Object.values(images).some(image => image)) {
             toast.error("Please fill all the fields")
             return
         }
+
         setLoading(true)
         try {
             const formData = new FormData();
             formData.append('roomType', input.roomType)
             formData.append('pricePerNight', input.pricePerNight)
+            formData.append('maxOccupancy', input.maxOccupancy)
 
-            //converting amenities into array and keeping enabled amenities
             const amenities = Object.keys(input.amenities).filter(key => input.amenities[key])
             formData.append('amenities', JSON.stringify(amenities))
 
-            //adding images to formdata
-            Object.keys(images).forEach((key)=>{
+            Object.keys(images).forEach((key) => {
                 images[key] && formData.append('images', images[key])
             })
 
-            const {data} = await axios.post('/api/rooms/', formData, {Headers: {Auhtorization: `Bearer ${await getToken}`}})
-
-            if(data.success){
+            const token = await getToken()
+            const { data } = await axios.post('/api/rooms/create', formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (data.success) {
                 toast.success(data.message)
                 setInput({
                     roomType: "",
-                    pricePerNight: 0,
+                    pricePerNight: "",
+                    maxOccupancy: "",
+                    description: "",
                     amenities: {
                         "Free WiFi": false,
                         "Free Breakfast": false,
@@ -76,17 +78,15 @@ const AddRoom = () => {
                     3: null,
                     4: null,
                 })
-            }else{
+            } else {
                 toast.error(data.message)
             }
         } catch (error) {
             toast.error(error.message)
-        }finally{
+            console.error("Full error:", error) 
+        } finally {
             setLoading(false)
         }
-
-
-
     }
 
     return (
@@ -121,6 +121,7 @@ const AddRoom = () => {
                         onChange={e => setInput({ ...input, roomType: e.target.value })}
                         className='border opacity-70 border-gray-300 mt-1 rounded p-2 w-full'
                     >
+                        <option value="">Select Room Type</option>
                         <option value="Single Bed">Single Bed</option>
                         <option value="Double Bed">Double Bed</option>
                         <option value="Family Room">Family Room</option>
@@ -138,6 +139,17 @@ const AddRoom = () => {
                         className='border border-gray-300 mt-1 rounded p-2 w-24'
                         value={input.pricePerNight}
                         onChange={e => setInput({ ...input, pricePerNight: e.target.value })}
+                    />
+                </div>
+
+                <div>
+                    <p className='mt-4 text-gray-800'>Max Occupancy</p>
+                    <input
+                        type="number"
+                        placeholder='0'
+                        className='border border-gray-300 mt-1 rounded p-2 w-24'
+                        value={input.maxOccupancy}
+                        onChange={e => setInput({ ...input, maxOccupancy: e.target.value })}
                     />
                 </div>
             </div>
@@ -160,8 +172,8 @@ const AddRoom = () => {
                 ))}
             </div>
 
-            <button className='bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer'>
-                Add Room
+            <button type="submit" className='bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer'>
+                {loading ? 'Adding...' : 'Add Room'}
             </button>
         </form>
     )

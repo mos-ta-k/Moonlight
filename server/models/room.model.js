@@ -22,6 +22,10 @@ const roomSchema = new mongoose.Schema({
     images: [
         {type: String}
     ],
+    maxOccupancy: {
+        type: Number,
+        required: true
+    },
     isAvailable: {
         type: Boolean,
         default: true

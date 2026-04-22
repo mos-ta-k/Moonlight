@@ -1,12 +1,12 @@
 import Room from "../models/room.model.js";
 import Hotel from "../models/hotel.model.js";
-import cloudinary from "../configs/cloudinary.js";
+import { cloudinary } from "../configs/cloudinary.js";
 
 //api to create a new room for hotel
 export const createRoom = async (req, res) => {
     try {
-        const {roomType, pricePerNight, amenities} = req.body;
-        const hotel = await Hotel.findOne({owner: req.auth.userid});
+        const {roomType, pricePerNight, amenities, maxOccupancy} = req.body;
+        const hotel = await Hotel.findOne({owner: req.user._id});
         if(!hotel){
             return res.json({success: false, error: "Hotel not found"});
         }
@@ -25,7 +25,8 @@ export const createRoom = async (req, res) => {
             roomType,
             pricePerNight: +pricePerNight,
             amenities: JSON.parse(amenities),
-            images: Images
+            images: Images,
+            maxOccupancy: +maxOccupancy
         })
         res.json({success: true, message: "Room created successfully"});
     } catch (error) {
@@ -54,7 +55,10 @@ export const getRooms = async (req, res) => {
 //api tp get all room for a specific hotel
 export const getOwnerRooms = async (req, res) => {
     try {
-        const hotelData = await Hotel({owner: req.auth.userId})
+        const hotelData = await Hotel.findOne({owner: req.user._id});
+        if (!hotelData) {
+            return res.json({success: true, rooms: []});
+        }
         const rooms = await Room.find({hotel: hotelData._id.toString()}).populate("hotel")
         res.json({success: true, rooms})
     } catch (error) {
