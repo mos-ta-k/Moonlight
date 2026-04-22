@@ -28,23 +28,19 @@ const clerkWebhooks = async (req, res) => {
 
     const { data, type } = JSON.parse(payload);
 
-
-
     const userData = {
-          _id: data.id,
-          email: data.email_addresses?.[0]?.email_address,
-          username:
-            `${data.first_name || ""}${data.last_name ? " " + data.last_name : ""}`.trim() ||
-            "Unknown",
-          image: data.image_url,
-        };
+      _id: data.id,
+      email: data.email_addresses?.[0]?.email_address,
+      username:
+        `${data.first_name || ""}${data.last_name ? " " + data.last_name : ""}`.trim() ||
+        "Unknown",
+      image: data.image_url,
+    };
     switch (type) {
       case "user.created":
-        
         await User.create(userData);
         break;
       case "user.updated":
-        
         await User.findByIdAndUpdate(data.id, userData, { new: true });
         break;
       case "user.deleted":
